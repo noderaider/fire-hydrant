@@ -20,7 +20,7 @@
     "postrelease": "npm run release-doc",
     "prerelease-doc": "npm run doc",
     "release-doc": "git subtree push --prefix doc origin gh-pages",
-    "postrelease-doc": "git commit -am \"doc-release\" && git push --follow-tags",
+    "postrelease-doc": "git push --follow-tags",
     "upgrade": "ncu -a && npm update",
     "git-save": "git add -A && git commit -am ",
     "prebuild-test": "rimraf spec/tests",

@@ -47,18 +47,118 @@
 <p><code>npm i -S fire-hydrant</code></p>
 <h2 id="documentation">Documentation</h2>
 <p>Functions used to store state objects, partial immutables, and full immutables to strings and restore them back to their original state.</p>
-<h2 id="usage">Usage</h2>
-<pre><code><code class="source-code prettyprint">import { fromHydrant, toHydrant, serialize, deserialize } from &apos;fire-hydrant&apos;
+<h2 id="example-with-react-router-https-npmjs-com-package-react-router-and-react-router-redux-https-npmjs-com-package-react-router-redux-with-async-routes">Example with <a href="https://npmjs.com/package/react-router">react-router</a> and <a href="https://npmjs.com/package/react-router-redux">react-router-redux</a> with async routes</h2>
+<h4 id="configurestore-js">configureStore.js</h4>
+<pre><code class="lang-js"><code class="source-code prettyprint">import { createStore, applyMiddleware } from &apos;redux&apos;
+import { routerMiddleware } from &apos;react-router-redux&apos;
+import { combineReducers } from &apos;redux&apos;
+import * as reducers from &apos;../reducers&apos;
+
+export default function configureStore(history, initialState) {
+  const reducer = combineReducers(reducers)
+  const enhancer = applyMiddleware([ routerMiddleware(history) ])
+  return createStore(reducer, initialState, enhancer)
+}</code>
+</code></pre>
+<h4 id="createrouter-js">createRouter.js</h4>
+<p><strong>Plug this router into your server.use()</strong></p>
+<pre><code class="lang-jsx"><code class="source-code prettyprint">import Router from &apos;router&apos;
+import { Provider } from &apos;react-redux&apos;
+import { createMemoryHistory, match, RouterContext } from &apos;react-router&apos;
+import { syncHistoryWithStore } from &apos;react-router-redux&apos;
+
+import { serialize } from &apos;fire-hydrant&apos;
+
+/** Routes can be direct server defined routes or a webpack bundle */
+import routes from &apos;./routes&apos;
 
 
-const regularObj =  { a: &apos;something&apos;
+const InitialState = ({ state }) =&gt; {
+  const serialized = serialize(state)
+  const __html = `window.__initialState__ = ${serialized}`
+  return &lt;script dangerouslySetInnerHTML={{ __html }} /&gt;
+}
+
+const HTML = ({ content, store }) =&gt; {
+  const state = store ? store.getState() : noop()
+
+  return (
+    &lt;html&gt;
+      &lt;head&gt;
+        &lt;meta charSet=&quot;utf-8&quot; /&gt;
+        &lt;title&gt;Fire Hydrant&lt;/title&gt;
+      &lt;/head&gt;
+      &lt;body&gt;
+        &lt;InitialState state={state} /&gt;
+        &lt;div id=&quot;root&quot; dangerouslySetInnerHTML={{ __html: content }}/&gt;
+        &lt;script src=&quot;/app.js&quot; /&gt;
+      &lt;/body&gt;
+    &lt;/html&gt;
+  )
+}
+
+const renderHTML = props =&gt; `&lt;!doctype html&gt;
+${renderToString(&lt;HTML {...props} /&gt;)}`
+
+export default function createRouter({ cors, paths }) {
+  const router = Router()
+  router.use((req, res, next) =&gt; {
+    try {
+      const memoryHistory = createMemoryHistory(req.path)
+      let store = configureStore(memoryHistory)
+      const history = syncHistoryWithStore(memoryHistory, store)
+
+      match({ history, routes, location: req.url }, (error, redirectLocation, renderProps) =&gt; {
+        if (error)
+          res.status(500).send(error.message)
+        else if (redirectLocation)
+          res.redirect(302, redirectLocation.pathname + redirectLocation.search)
+        else if (renderProps) {
+          const content = renderToString(&lt;Provider store={store}&gt;&lt;RouterContext {...renderProps} /&gt;&lt;/Provider&gt;)
+          res.send(renderHTML({ content, store }))
+        } else
+          next()
+      })
+    } catch(routerError) {
+      res.status(500).send(process.env.NODE_ENV !== &apos;production&apos; ? routerError : &apos;An error occurred rendering the application.&apos;)
+    }
+  })
+  return router
+}</code>
+</code></pre>
+<h4 id="app-js">app.js</h4>
+<p><strong>Client entry point - This is where the state gets rehydrated.</strong></p>
+<pre><code class="lang-jsx"><code class="source-code prettyprint">import React from &apos;react&apos;
+import { render } from &apos;react-dom&apos;
+import { Provider } from &apos;react-redux&apos;
+import { match, Router, browserHistory } from &apos;react-router&apos;
+import { syncHistoryWithStore } from &apos;react-router-redux&apos;
+
+import { fromHydrant } from &apos;fire-hydrant&apos;
+
+import routes from &apos;./routes&apos;
+
+/** Rehydrate our server built state that is stored in __initialState__ global */
+const initialState = fromHydrant(window.__initialState__ || {})
+
+const store = configureStore(browserHistory, initialState)
+const history = syncHistoryWithStore(browserHistory, store)
+
+const rootElement = document.getElementById(&apos;root&apos;)
+match({ history, routes }, (err, redirectLocation, renderProps) =&gt; {
+  render(&lt;Provider store={store}&gt;&lt;Router {...renderProps} /&gt;&lt;/Provider&gt;, rootElement)
+})</code>
+</code></pre>
+<h2 id="unit-tests">Unit tests</h2>
+<pre><code class="lang-js"><code class="source-code prettyprint">const regularObj =  { a: &apos;something&apos;
                     , b: [1, 2, 3]
                     , c: { foo: { bar: true }}
                     }
 const partialImmutable =  { ...regularObj
                           , d: Immutable.Map({ a: &apos;foo&apos;, b: &apos;bar&apos; })
                           }
-const topLevelImmutableObj = Immutable.fromJS(regularObj)
+const topLevelImmutable = Immutable.fromJS(regularObj)
+
 
 
 it(&apos;should toHydrant to an object&apos;, () =&gt; expect(toHydrant({ foo: &apos;bar&apos; })).toEqual(jasmine.any(Object)))
@@ -79,9 +179,9 @@ it(&apos;should be able to toHydrant and fromHydrant back for partial immutable&
 })
 
 it(&apos;should be able to toHydrant and fromHydrant back for top level immutable&apos;, () =&gt; {
-  let hydrant = toHydrant(topLevelImmutableObj)
+  let hydrant = toHydrant(topLevelImmutable)
   let result = fromHydrant(hydrant)
-  expect(result).toEqual(topLevelImmutableObj)
+  expect(result).toEqual(topLevelImmutable)
 })
 
 it(&apos;should be able to serialize and deserialize to same values for regular object&apos;, () =&gt; {
@@ -97,11 +197,12 @@ it(&apos;should be able to serialize and deserialize to same values for partial 
 })
 
 it(&apos;should be able to serialize and deserialize to same values for top level immutable&apos;, () =&gt; {
-  let serialized = serialize(topLevelImmutableObj)
+  let serialized = serialize(topLevelImmutable)
   let result = deserialize(serialized)
-  expect(result).toEqual(topLevelImmutableObj)
+  expect(result).toEqual(topLevelImmutable)
 })</code>
-</code></pre></div>
+</code></pre>
+</div>
 </div>
 
 <footer class="footer">

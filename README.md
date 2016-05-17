@@ -1,4 +1,4 @@
-# redux-load
+# fire-hydrant
 
 **hydration and serialization of state, targeted at Redux Server Side Rendering and ImmutableJS**
 

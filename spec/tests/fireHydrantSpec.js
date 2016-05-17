@@ -21,7 +21,7 @@ describe('fireHydrant', function () {
   };
   var partialImmutable = _extends({}, regularObj, { d: _immutable2.default.Map({ a: 'foo', b: 'bar' })
   });
-  var topLevelImmutableObj = _immutable2.default.fromJS(regularObj);
+  var topLevelImmutable = _immutable2.default.fromJS(regularObj);
 
   it('has toHydrant function', function () {
     return expect(toHydrant).toEqual(jasmine.any(Function));
@@ -62,9 +62,9 @@ describe('fireHydrant', function () {
   });
 
   it('should be able to toHydrant and fromHydrant back for top level immutable', function () {
-    var hydrant = toHydrant(topLevelImmutableObj);
+    var hydrant = toHydrant(topLevelImmutable);
     var result = fromHydrant(hydrant);
-    expect(result).toEqual(topLevelImmutableObj);
+    expect(result).toEqual(topLevelImmutable);
   });
 
   it('should be able to serialize and deserialize to same values for regular object', function () {
@@ -80,8 +80,8 @@ describe('fireHydrant', function () {
   });
 
   it('should be able to serialize and deserialize to same values for top level immutable', function () {
-    var serialized = serialize(topLevelImmutableObj);
+    var serialized = serialize(topLevelImmutable);
     var result = deserialize(serialized);
-    expect(result).toEqual(topLevelImmutableObj);
+    expect(result).toEqual(topLevelImmutable);
   });
 });

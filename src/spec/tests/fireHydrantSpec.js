@@ -14,7 +14,7 @@ describe('fireHydrant', () => {
   const partialImmutable =  { ...regularObj
                             , d: Immutable.Map({ a: 'foo', b: 'bar' })
                             }
-  const topLevelImmutableObj = Immutable.fromJS(regularObj)
+  const topLevelImmutable = Immutable.fromJS(regularObj)
 
   it('has toHydrant function', () => expect(toHydrant).toEqual(jasmine.any(Function)))
   it('has fromHydrant function', () => expect(fromHydrant).toEqual(jasmine.any(Function)))
@@ -24,7 +24,7 @@ describe('fireHydrant', () => {
   it('should toHydrant to an object', () => expect(toHydrant({ foo: 'bar' })).toEqual(jasmine.any(Object)))
   it('should fromHydrant to an object', () => expect(fromHydrant({ foo: 'bar' })).toEqual(jasmine.any(Object)))
   it('should serialize to a string', () => expect(serialize({ foo: 'bar' })).toEqual(jasmine.any(String)))
-  it('should deserialize to an object', () => expect(deserialize(`{"foo": "bar"}`)).toEqual(jasmine.any(Object)))
+  it('should deserialize to an object', () => expect(deserialize('{"foo": "bar"}')).toEqual(jasmine.any(Object)))
 
   it('should be able to toHydrant and fromHydrant back for regular object', () => {
     let hydrant = toHydrant(regularObj)
@@ -39,9 +39,9 @@ describe('fireHydrant', () => {
   })
 
   it('should be able to toHydrant and fromHydrant back for top level immutable', () => {
-    let hydrant = toHydrant(topLevelImmutableObj)
+    let hydrant = toHydrant(topLevelImmutable)
     let result = fromHydrant(hydrant)
-    expect(result).toEqual(topLevelImmutableObj)
+    expect(result).toEqual(topLevelImmutable)
   })
 
   it('should be able to serialize and deserialize to same values for regular object', () => {
@@ -57,8 +57,8 @@ describe('fireHydrant', () => {
   })
 
   it('should be able to serialize and deserialize to same values for top level immutable', () => {
-    let serialized = serialize(topLevelImmutableObj)
+    let serialized = serialize(topLevelImmutable)
     let result = deserialize(serialized)
-    expect(result).toEqual(topLevelImmutableObj)
+    expect(result).toEqual(topLevelImmutable)
   })
 })

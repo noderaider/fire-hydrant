@@ -1,10 +1,9 @@
-import 'babel-polyfill'
 import { assert } from 'chai'
 import Immutable, { Iterable } from 'immutable'
 import serializeJS from 'serialize-javascript'
 
 const NO_RECURSE = ['undefined', 'boolean', 'number', 'string', 'symbol', 'function']
-const shouldRecurse = obj => obj !== null && !NO_RECURSE.includes(typeof obj) && !Array.isArray(obj) && typeof obj === 'object'
+const shouldRecurse = obj => obj !== null && NO_RECURSE.indexOf(typeof obj) === -1 && !Array.isArray(obj) && typeof obj === 'object'
 
 export const toHydrant = obj => {
   if(Iterable.isIterable(obj)) {

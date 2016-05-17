@@ -10,7 +10,7 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import 'babel-polyfill'\r\nimport { assert } from 'chai'\r\nimport Immutable, { Iterable } from 'immutable'\r\nimport serializeJS from 'serialize-javascript'\r\n\r\nconst NO_RECURSE = ['undefined', 'boolean', 'number', 'string', 'symbol', 'function']\r\nconst shouldRecurse = obj => obj !== null && !NO_RECURSE.includes(typeof obj) && !Array.isArray(obj) && typeof obj === 'object'\r\n\r\nexport const toHydrant = obj => {\r\n  if(Iterable.isIterable(obj)) {\r\n    const __fire = ['(function (o, d) { return d.Immutable.fromJS(o); })', obj.toJS()]\r\n    return { __fire  }\r\n  }\r\n  if(Array.isArray(obj)) {\r\n    return obj.map(x => shouldRecurse(x) ? toHydrant(x) : x)\r\n  }\r\n  const objKeys = Object.keys(obj)\r\n  if(objKeys.length > 0) {\r\n    return objKeys.reduce((newObj, key) => {\r\n      const node = shouldRecurse(obj[key]) ? toHydrant(obj[key]) : obj[key]\r\n      return { ...newObj, [key]: node }\r\n    }, {})\r\n  }\r\n  return obj\r\n}\r\n\r\nexport const fromHydrant = obj => {\r\n  if(obj.__fire) {\r\n    let fn = eval(obj.__fire[0])\r\n    return fn(obj.__fire[1], { Immutable })\r\n  }\r\n  if(Array.isArray(obj))\r\n    return obj.map(x => shouldRecurse(x) ? fromHydrant(x) : x)\r\n  const objKeys = Object.keys(obj)\r\n  if(objKeys.length > 0) {\r\n    return objKeys.reduce((newObj, key) => {\r\n      const node = shouldRecurse(obj[key]) ? fromHydrant(obj[key]) : obj[key]\r\n      return { ...newObj, ... { [key]: node } }\r\n    }, {})\r\n  }\r\n  return obj\r\n}\r\n\r\nexport const serialize = obj => {\r\n  return serializeJS(toHydrant(obj))\r\n}\r\n\r\nexport const deserialize = str => {\r\n  let obj = JSON.parse(str)\r\n  return fromHydrant(obj)\r\n}\r\n"
+    "content": "import { assert } from 'chai'\r\nimport Immutable, { Iterable } from 'immutable'\r\nimport serializeJS from 'serialize-javascript'\r\n\r\nconst NO_RECURSE = ['undefined', 'boolean', 'number', 'string', 'symbol', 'function']\r\nconst shouldRecurse = obj => obj !== null && NO_RECURSE.indexOf(typeof obj) === -1 && !Array.isArray(obj) && typeof obj === 'object'\r\n\r\nexport const toHydrant = obj => {\r\n  if(Iterable.isIterable(obj)) {\r\n    const __fire = ['(function (o, d) { return d.Immutable.fromJS(o); })', obj.toJS()]\r\n    return { __fire  }\r\n  }\r\n  if(Array.isArray(obj)) {\r\n    return obj.map(x => shouldRecurse(x) ? toHydrant(x) : x)\r\n  }\r\n  const objKeys = Object.keys(obj)\r\n  if(objKeys.length > 0) {\r\n    return objKeys.reduce((newObj, key) => {\r\n      const node = shouldRecurse(obj[key]) ? toHydrant(obj[key]) : obj[key]\r\n      return { ...newObj, [key]: node }\r\n    }, {})\r\n  }\r\n  return obj\r\n}\r\n\r\nexport const fromHydrant = obj => {\r\n  if(obj.__fire) {\r\n    let fn = eval(obj.__fire[0])\r\n    return fn(obj.__fire[1], { Immutable })\r\n  }\r\n  if(Array.isArray(obj))\r\n    return obj.map(x => shouldRecurse(x) ? fromHydrant(x) : x)\r\n  const objKeys = Object.keys(obj)\r\n  if(objKeys.length > 0) {\r\n    return objKeys.reduce((newObj, key) => {\r\n      const node = shouldRecurse(obj[key]) ? fromHydrant(obj[key]) : obj[key]\r\n      return { ...newObj, ... { [key]: node } }\r\n    }, {})\r\n  }\r\n  return obj\r\n}\r\n\r\nexport const serialize = obj => {\r\n  return serializeJS(toHydrant(obj))\r\n}\r\n\r\nexport const deserialize = str => {\r\n  let obj = JSON.parse(str)\r\n  return fromHydrant(obj)\r\n}\r\n"
   },
   {
     "__docId__": 1,
@@ -25,7 +25,7 @@
     "importPath": "fire-hydrant",
     "importStyle": null,
     "description": null,
-    "lineNumber": 6,
+    "lineNumber": 5,
     "undocument": true,
     "type": {
       "types": [
@@ -46,7 +46,7 @@
     "importPath": "fire-hydrant",
     "importStyle": null,
     "description": null,
-    "lineNumber": 7,
+    "lineNumber": 6,
     "undocument": true,
     "type": {
       "types": [
@@ -67,7 +67,7 @@
     "importPath": "fire-hydrant",
     "importStyle": "{toHydrant}",
     "description": null,
-    "lineNumber": 9,
+    "lineNumber": 8,
     "undocument": true,
     "type": {
       "types": [
@@ -88,7 +88,7 @@
     "importPath": "fire-hydrant",
     "importStyle": "{fromHydrant}",
     "description": null,
-    "lineNumber": 27,
+    "lineNumber": 26,
     "undocument": true,
     "type": {
       "types": [
@@ -109,7 +109,7 @@
     "importPath": "fire-hydrant",
     "importStyle": "{serialize}",
     "description": null,
-    "lineNumber": 44,
+    "lineNumber": 43,
     "undocument": true,
     "type": {
       "types": [
@@ -130,7 +130,7 @@
     "importPath": "fire-hydrant",
     "importStyle": "{deserialize}",
     "description": null,
-    "lineNumber": 48,
+    "lineNumber": 47,
     "undocument": true,
     "type": {
       "types": [

@@ -22,6 +22,7 @@
     "release-doc": "git subtree push --prefix doc origin gh-pages",
     "postrelease-doc": "git commit -am \"doc-release\" && git push --follow-tags",
     "upgrade": "ncu -a && npm update",
+    "git-save": "git add -A && git commit -am ",
     "prebuild-test": "rimraf spec/tests",
     "build-test": "babel src/spec -d spec",
     "pretest": "npm run build && npm run build-test",

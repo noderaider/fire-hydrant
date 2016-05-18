@@ -20,7 +20,7 @@
     "postdoc": "npm run git-save -- docs",
     "prerelease": "npm run test",
     "release": "npm version patch && npm publish",
-    "postrelease": "npm run release-doc",
+    "_postrelease": "npm run release-doc",
     "prerelease-doc": "npm run doc",
     "release-doc": "git subtree push --prefix doc origin gh-pages",
     "postrelease-doc": "git push --follow-tags",

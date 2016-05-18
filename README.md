@@ -40,6 +40,7 @@ export default function configureStore(history, initialState) {
 
 ```jsx
 import Router from 'router'
+import Immutable from 'immutable'
 import { Provider } from 'react-redux'
 import { createMemoryHistory, match, RouterContext } from 'react-router'
 import { syncHistoryWithStore } from 'react-router-redux'
@@ -51,7 +52,7 @@ import routes from './routes'
 
 
 const InitialState = ({ state }) => {
-  const serialized = serialize(state)
+  const serialized = serialize(state, { Immutable })
   const __html = `window.__initialState__ = ${serialized}`
   return <script dangerouslySetInnerHTML={{ __html }} />
 }
@@ -110,6 +111,7 @@ export default function createRouter({ cors, paths }) {
 
 ```jsx
 import React from 'react'
+import Immutable from 'immutable'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 import { match, Router, browserHistory } from 'react-router'
@@ -120,7 +122,7 @@ import { fromHydrant } from 'fire-hydrant'
 import routes from './routes'
 
 /** Rehydrate our server built state that is stored in __initialState__ global */
-const initialState = fromHydrant(window.__initialState__ || {})
+const initialState = fromHydrant(window.__initialState__ || {}, { Immutable })
 
 const store = configureStore(browserHistory, initialState)
 const history = syncHistoryWithStore(browserHistory, store)

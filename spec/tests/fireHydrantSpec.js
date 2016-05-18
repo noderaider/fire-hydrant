@@ -37,51 +37,51 @@ describe('fireHydrant', function () {
   });
 
   it('should toHydrant to an object', function () {
-    return expect(toHydrant({ foo: 'bar' })).toEqual(jasmine.any(Object));
+    return expect(toHydrant({ foo: 'bar' }, { Immutable: _immutable2.default })).toEqual(jasmine.any(Object));
   });
   it('should fromHydrant to an object', function () {
-    return expect(fromHydrant({ foo: 'bar' })).toEqual(jasmine.any(Object));
+    return expect(fromHydrant({ foo: 'bar' }, { Immutable: _immutable2.default })).toEqual(jasmine.any(Object));
   });
   it('should serialize to a string', function () {
-    return expect(serialize({ foo: 'bar' })).toEqual(jasmine.any(String));
+    return expect(serialize({ foo: 'bar' }, { Immutable: _immutable2.default })).toEqual(jasmine.any(String));
   });
   it('should deserialize to an object', function () {
-    return expect(deserialize('{"foo": "bar"}')).toEqual(jasmine.any(Object));
+    return expect(deserialize('{"foo": "bar"}', { Immutable: _immutable2.default })).toEqual(jasmine.any(Object));
   });
 
   it('should be able to toHydrant and fromHydrant back for regular object', function () {
-    var hydrant = toHydrant(regularObj);
-    var result = fromHydrant(hydrant);
+    var hydrant = toHydrant(regularObj, { Immutable: _immutable2.default });
+    var result = fromHydrant(hydrant, { Immutable: _immutable2.default });
     expect(result).toEqual(regularObj);
   });
 
   it('should be able to toHydrant and fromHydrant back for partial immutable', function () {
-    var hydrant = toHydrant(partialImmutable);
-    var result = fromHydrant(hydrant);
+    var hydrant = toHydrant(partialImmutable, { Immutable: _immutable2.default });
+    var result = fromHydrant(hydrant, { Immutable: _immutable2.default });
     expect(result).toEqual(partialImmutable);
   });
 
   it('should be able to toHydrant and fromHydrant back for top level immutable', function () {
-    var hydrant = toHydrant(topLevelImmutable);
-    var result = fromHydrant(hydrant);
+    var hydrant = toHydrant(topLevelImmutable, { Immutable: _immutable2.default });
+    var result = fromHydrant(hydrant, { Immutable: _immutable2.default });
     expect(result).toEqual(topLevelImmutable);
   });
 
   it('should be able to serialize and deserialize to same values for regular object', function () {
-    var serialized = serialize(regularObj);
-    var result = deserialize(serialized);
+    var serialized = serialize(regularObj, { Immutable: _immutable2.default });
+    var result = deserialize(serialized, { Immutable: _immutable2.default });
     expect(result).toEqual(regularObj);
   });
 
   it('should be able to serialize and deserialize to same values for partial immutable', function () {
-    var serialized = serialize(partialImmutable);
-    var result = deserialize(serialized);
+    var serialized = serialize(partialImmutable, { Immutable: _immutable2.default });
+    var result = deserialize(serialized, { Immutable: _immutable2.default });
     expect(result).toEqual(partialImmutable);
   });
 
   it('should be able to serialize and deserialize to same values for top level immutable', function () {
-    var serialized = serialize(topLevelImmutable);
-    var result = deserialize(serialized);
+    var serialized = serialize(topLevelImmutable, { Immutable: _immutable2.default });
+    var result = deserialize(serialized, { Immutable: _immutable2.default });
     expect(result).toEqual(topLevelImmutable);
   });
 });

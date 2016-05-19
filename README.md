@@ -1,9 +1,10 @@
 # fire-hydrant
 
-**hydration and serialization of state, targeted at Redux Server Side Rendering and ImmutableJS**
+**lightweight hydration and serialization of state, targeted at Redux Server Side Rendering and ImmutableJS**
 
 [![NPM](https://nodei.co/npm/fire-hydrant.png?stars=true&downloads=true)](https://nodei.co/npm/fire-hydrant/)
 
+![dependencies](/cchamberlain/fire-hydrant/blob/master/public/images/dependencies.png)
 
 ## Install
 
@@ -15,7 +16,7 @@
 Functions used to store state objects, partial immutables, and full immutables to strings and restore them back to their original state.
 
 
-## Example with [react-router](https://npmjs.com/package/react-router) and [react-router-redux](https://npmjs.com/package/react-router-redux) with async routes
+## [react-router](https://npmjs.com/package/react-router) and [react-router-redux](https://npmjs.com/package/react-router-redux) with async routes example
 
 
 #### configureStore.js
@@ -39,13 +40,14 @@ export default function configureStore(history, initialState) {
 **Plug this router into your server.use()**
 
 ```jsx
+import React from 'react'
 import Router from 'router'
 import Immutable from 'immutable'
 import { Provider } from 'react-redux'
 import { createMemoryHistory, match, RouterContext } from 'react-router'
 import { syncHistoryWithStore } from 'react-router-redux'
 
-import { serialize } from 'fire-hydrant'
+import { serialize, createInitialState } from 'fire-hydrant'
 
 /** Routes can be direct server defined routes or a webpack bundle */
 import routes from './routes'
@@ -56,6 +58,10 @@ const InitialState = ({ state }) => {
   const __html = `window.__initialState__ = ${serialized}`
   return <script dangerouslySetInnerHTML={{ __html }} />
 }
+
+
+//-- ALTERNATE: Import createInitialState component factory for sanity checks and less boilerplate.
+const InitialState = createInitialState({ React, Immutable })
 
 const HTML = ({ content, store }) => {
   const state = store ? store.getState() : noop()
@@ -105,6 +111,7 @@ export default function createRouter({ cors, paths }) {
 }
 ```
 
+
 #### app.js
 
 **Client entry point - This is where the state gets rehydrated.**
@@ -132,6 +139,7 @@ match({ history, routes }, (err, redirectLocation, renderProps) => {
   render(<Provider store={store}><Router {...renderProps} /></Provider>, rootElement)
 })
 ```
+
 
 
 

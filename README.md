@@ -4,7 +4,7 @@
 
 [![NPM](https://nodei.co/npm/fire-hydrant.png?stars=true&downloads=true)](https://nodei.co/npm/fire-hydrant/)
 
-![dependencies](/cchamberlain/fire-hydrant/blob/master/public/images/dependencies.png)
+![dependencies](https://raw.githubusercontent.com/cchamberlain/fire-hydrant/master/public/images/dependencies.png)
 
 ## Install
 
